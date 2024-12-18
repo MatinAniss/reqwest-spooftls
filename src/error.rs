@@ -5,7 +5,7 @@ use std::io;
 
 use crate::{StatusCode, Url};
 
-/// A `Result` alias where the `Err` case is `reqwest::Error`.
+/// A `Result` alias where the `Err` case is `reqwest_spooftls::Error`.
 pub type Result<T> = std::result::Result<T, Error>;
 
 /// The Errors that may occur when processing a `Request`.
@@ -46,7 +46,7 @@ impl Error {
     /// ```
     /// # async fn run() {
     /// // displays last stop of a redirect loop
-    /// let response = reqwest::get("http://site.with.redirect.loop").await;
+    /// let response = reqwest_spooftls::get("http://site.with.redirect.loop").await;
     /// if let Err(e) = response {
     ///     if e.is_redirect() {
     ///         if let Some(final_stop) = e.url() {
@@ -167,7 +167,7 @@ impl Error {
 
 impl fmt::Debug for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let mut builder = f.debug_struct("reqwest::Error");
+        let mut builder = f.debug_struct("reqwest_spooftls::Error");
 
         builder.field("kind", &self.inner.kind);
 
@@ -361,9 +361,9 @@ mod tests {
     #[test]
     fn roundtrip_io_error() {
         let orig = super::request("orig");
-        // Convert reqwest::Error into an io::Error...
+        // Convert reqwest_spooftls::Error into an io::Error...
         let io = orig.into_io();
-        // Convert that io::Error back into a reqwest::Error...
+        // Convert that io::Error back into a reqwest_spooftls::Error...
         let err = super::decode_io(io);
         // It should have pulled out the original, not nested it...
         match err.inner.kind {

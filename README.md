@@ -1,4 +1,4 @@
-# reqwest
+# reqwest-spooftls
 
 [![crates.io](https://img.shields.io/crates/v/reqwest.svg)](https://crates.io/crates/reqwest)
 [![Documentation](https://docs.rs/reqwest/badge.svg)](https://docs.rs/reqwest)

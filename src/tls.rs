@@ -133,7 +133,7 @@ impl Certificate {
     /// let mut buf = Vec::new();
     /// File::open("my_cert.der")?
     ///     .read_to_end(&mut buf)?;
-    /// let cert = reqwest::Certificate::from_der(&buf)?;
+    /// let cert = reqwest_spooftls::Certificate::from_der(&buf)?;
     /// # drop(cert);
     /// # Ok(())
     /// # }
@@ -158,7 +158,7 @@ impl Certificate {
     /// let mut buf = Vec::new();
     /// File::open("my_cert.pem")?
     ///     .read_to_end(&mut buf)?;
-    /// let cert = reqwest::Certificate::from_pem(&buf)?;
+    /// let cert = reqwest_spooftls::Certificate::from_pem(&buf)?;
     /// # drop(cert);
     /// # Ok(())
     /// # }
@@ -184,7 +184,7 @@ impl Certificate {
     /// let mut buf = Vec::new();
     /// File::open("ca-bundle.crt")?
     ///     .read_to_end(&mut buf)?;
-    /// let certs = reqwest::Certificate::from_pem_bundle(&buf)?;
+    /// let certs = reqwest_spooftls::Certificate::from_pem_bundle(&buf)?;
     /// # drop(certs);
     /// # Ok(())
     /// # }
@@ -260,7 +260,7 @@ impl Identity {
     /// let mut buf = Vec::new();
     /// File::open("my-ident.pfx")?
     ///     .read_to_end(&mut buf)?;
-    /// let pkcs12 = reqwest::Identity::from_pkcs12_der(&buf, "my-privkey-password")?;
+    /// let pkcs12 = reqwest_spooftls::Identity::from_pkcs12_der(&buf, "my-privkey-password")?;
     /// # drop(pkcs12);
     /// # Ok(())
     /// # }
@@ -294,7 +294,7 @@ impl Identity {
     /// # fn pkcs8() -> Result<(), Box<dyn std::error::Error>> {
     /// let cert = fs::read("client.pem")?;
     /// let key = fs::read("key.pem")?;
-    /// let pkcs8 = reqwest::Identity::from_pkcs8_pem(&cert, &key)?;
+    /// let pkcs8 = reqwest_spooftls::Identity::from_pkcs8_pem(&cert, &key)?;
     /// # drop(pkcs8);
     /// # Ok(())
     /// # }
@@ -328,7 +328,7 @@ impl Identity {
     /// let mut buf = Vec::new();
     /// File::open("my-ident.pem")?
     ///     .read_to_end(&mut buf)?;
-    /// let id = reqwest::Identity::from_pem(&buf)?;
+    /// let id = reqwest_spooftls::Identity::from_pem(&buf)?;
     /// # drop(id);
     /// # Ok(())
     /// # }
@@ -429,7 +429,7 @@ impl CertificateRevocationList {
     /// let mut buf = Vec::new();
     /// File::open("my_crl.pem")?
     ///     .read_to_end(&mut buf)?;
-    /// let crl = reqwest::tls::CertificateRevocationList::from_pem(&buf)?;
+    /// let crl = reqwest_spooftls::tls::CertificateRevocationList::from_pem(&buf)?;
     /// # drop(crl);
     /// # Ok(())
     /// # }
@@ -458,7 +458,7 @@ impl CertificateRevocationList {
     /// let mut buf = Vec::new();
     /// File::open("crl-bundle.crl")?
     ///     .read_to_end(&mut buf)?;
-    /// let crls = reqwest::tls::CertificateRevocationList::from_pem_bundle(&buf)?;
+    /// let crls = reqwest_spooftls::tls::CertificateRevocationList::from_pem_bundle(&buf)?;
     /// # drop(crls);
     /// # Ok(())
     /// # }

@@ -8,7 +8,7 @@ use http::header::{CONTENT_LENGTH, CONTENT_TYPE, TRANSFER_ENCODING};
 #[cfg(feature = "json")]
 use std::collections::HashMap;
 
-use reqwest::Client;
+use reqwest_spooftls::Client;
 
 #[tokio::test]
 async fn auto_headers() {
@@ -46,7 +46,7 @@ async fn auto_headers() {
     });
 
     let url = format!("http://{}/1", server.addr());
-    let res = reqwest::Client::builder()
+    let res = reqwest_spooftls::Client::builder()
         .no_proxy()
         .build()
         .unwrap()
@@ -56,7 +56,7 @@ async fn auto_headers() {
         .unwrap();
 
     assert_eq!(res.url().as_str(), &url);
-    assert_eq!(res.status(), reqwest::StatusCode::OK);
+    assert_eq!(res.status(), reqwest_spooftls::StatusCode::OK);
     assert_eq!(res.remote_addr(), Some(server.addr()));
 }
 
@@ -72,7 +72,7 @@ async fn donot_set_content_length_0_if_have_no_body() {
     });
 
     let url = format!("http://{}/content-length", server.addr());
-    let res = reqwest::Client::builder()
+    let res = reqwest_spooftls::Client::builder()
         .no_proxy()
         .build()
         .expect("client builder")
@@ -81,7 +81,7 @@ async fn donot_set_content_length_0_if_have_no_body() {
         .await
         .expect("request");
 
-    assert_eq!(res.status(), reqwest::StatusCode::OK);
+    assert_eq!(res.status(), reqwest_spooftls::StatusCode::OK);
 }
 
 #[cfg(feature = "http3")]
@@ -97,7 +97,7 @@ async fn http3_request_full() {
     });
 
     let url = format!("https://{}/content-length", server.addr());
-    let res = reqwest::Client::builder()
+    let res = reqwest_spooftls::Client::builder()
         .http3_prior_knowledge()
         .danger_accept_invalid_certs(true)
         .build()
@@ -110,7 +110,7 @@ async fn http3_request_full() {
         .expect("request");
 
     assert_eq!(res.version(), http::Version::HTTP_3);
-    assert_eq!(res.status(), reqwest::StatusCode::OK);
+    assert_eq!(res.status(), reqwest_spooftls::StatusCode::OK);
 }
 
 #[tokio::test]
@@ -121,7 +121,7 @@ async fn user_agent() {
     });
 
     let url = format!("http://{}/ua", server.addr());
-    let res = reqwest::Client::builder()
+    let res = reqwest_spooftls::Client::builder()
         .user_agent("reqwest-test-agent")
         .build()
         .expect("client builder")
@@ -130,7 +130,7 @@ async fn user_agent() {
         .await
         .expect("request");
 
-    assert_eq!(res.status(), reqwest::StatusCode::OK);
+    assert_eq!(res.status(), reqwest_spooftls::StatusCode::OK);
 }
 
 #[tokio::test]
@@ -221,7 +221,7 @@ async fn body_pipe_response() {
         .await
         .expect("get1");
 
-    assert_eq!(res1.status(), reqwest::StatusCode::OK);
+    assert_eq!(res1.status(), reqwest_spooftls::StatusCode::OK);
     assert_eq!(res1.content_length(), Some(7));
 
     // and now ensure we can "pipe" the response to another request
@@ -232,7 +232,7 @@ async fn body_pipe_response() {
         .await
         .expect("res2");
 
-    assert_eq!(res2.status(), reqwest::StatusCode::OK);
+    assert_eq!(res2.status(), reqwest_spooftls::StatusCode::OK);
 }
 
 #[tokio::test]
@@ -245,7 +245,7 @@ async fn overridden_dns_resolution_with_gai() {
         "http://{overridden_domain}:{}/domain_override",
         server.addr().port()
     );
-    let client = reqwest::Client::builder()
+    let client = reqwest_spooftls::Client::builder()
         .no_proxy()
         .resolve(overridden_domain, server.addr())
         .build()
@@ -253,7 +253,7 @@ async fn overridden_dns_resolution_with_gai() {
     let req = client.get(&url);
     let res = req.send().await.expect("request");
 
-    assert_eq!(res.status(), reqwest::StatusCode::OK);
+    assert_eq!(res.status(), reqwest_spooftls::StatusCode::OK);
     let text = res.text().await.expect("Failed to get text");
     assert_eq!("Hello", text);
 }
@@ -270,7 +270,7 @@ async fn overridden_dns_resolution_with_gai_multiple() {
     );
     // the server runs on IPv4 localhost, so provide both IPv4 and IPv6 and let the happy eyeballs
     // algorithm decide which address to use.
-    let client = reqwest::Client::builder()
+    let client = reqwest_spooftls::Client::builder()
         .no_proxy()
         .resolve_to_addrs(
             overridden_domain,
@@ -287,7 +287,7 @@ async fn overridden_dns_resolution_with_gai_multiple() {
     let req = client.get(&url);
     let res = req.send().await.expect("request");
 
-    assert_eq!(res.status(), reqwest::StatusCode::OK);
+    assert_eq!(res.status(), reqwest_spooftls::StatusCode::OK);
     let text = res.text().await.expect("Failed to get text");
     assert_eq!("Hello", text);
 }
@@ -303,7 +303,7 @@ async fn overridden_dns_resolution_with_hickory_dns() {
         "http://{overridden_domain}:{}/domain_override",
         server.addr().port()
     );
-    let client = reqwest::Client::builder()
+    let client = reqwest_spooftls::Client::builder()
         .no_proxy()
         .resolve(overridden_domain, server.addr())
         .hickory_dns(true)
@@ -312,7 +312,7 @@ async fn overridden_dns_resolution_with_hickory_dns() {
     let req = client.get(&url);
     let res = req.send().await.expect("request");
 
-    assert_eq!(res.status(), reqwest::StatusCode::OK);
+    assert_eq!(res.status(), reqwest_spooftls::StatusCode::OK);
     let text = res.text().await.expect("Failed to get text");
     assert_eq!("Hello", text);
 }
@@ -330,7 +330,7 @@ async fn overridden_dns_resolution_with_hickory_dns_multiple() {
     );
     // the server runs on IPv4 localhost, so provide both IPv4 and IPv6 and let the happy eyeballs
     // algorithm decide which address to use.
-    let client = reqwest::Client::builder()
+    let client = reqwest_spooftls::Client::builder()
         .no_proxy()
         .resolve_to_addrs(
             overridden_domain,
@@ -348,7 +348,7 @@ async fn overridden_dns_resolution_with_hickory_dns_multiple() {
     let req = client.get(&url);
     let res = req.send().await.expect("request");
 
-    assert_eq!(res.status(), reqwest::StatusCode::OK);
+    assert_eq!(res.status(), reqwest_spooftls::StatusCode::OK);
     let text = res.text().await.expect("Failed to get text");
     assert_eq!("Hello", text);
 }
@@ -358,7 +358,7 @@ async fn overridden_dns_resolution_with_hickory_dns_multiple() {
 fn use_preconfigured_tls_with_bogus_backend() {
     struct DefinitelyNotTls;
 
-    reqwest::Client::builder()
+    reqwest_spooftls::Client::builder()
         .use_preconfigured_tls(DefinitelyNotTls)
         .build()
         .expect_err("definitely is not TLS");
@@ -373,7 +373,7 @@ fn use_preconfigured_native_tls_default() {
         .build()
         .expect("tls builder");
 
-    reqwest::Client::builder()
+    reqwest_spooftls::Client::builder()
         .use_preconfigured_tls(tls)
         .build()
         .expect("preconfigured default tls");
@@ -389,7 +389,7 @@ fn use_preconfigured_rustls_default() {
         .with_root_certificates(root_cert_store)
         .with_no_client_auth();
 
-    reqwest::Client::builder()
+    reqwest_spooftls::Client::builder()
         .use_preconfigured_tls(tls)
         .build()
         .expect("preconfigured rustls tls");
@@ -402,7 +402,7 @@ async fn http2_upgrade() {
     let server = server::http(move |_| async move { http::Response::default() });
 
     let url = format!("https://localhost:{}", server.addr().port());
-    let res = reqwest::Client::builder()
+    let res = reqwest_spooftls::Client::builder()
         .danger_accept_invalid_certs(true)
         .use_rustls_tls()
         .build()
@@ -412,15 +412,15 @@ async fn http2_upgrade() {
         .await
         .expect("request");
 
-    assert_eq!(res.status(), reqwest::StatusCode::OK);
-    assert_eq!(res.version(), reqwest::Version::HTTP_2);
+    assert_eq!(res.status(), reqwest_spooftls::StatusCode::OK);
+    assert_eq!(res.version(), reqwest_spooftls::Version::HTTP_2);
 }
 
 #[cfg(feature = "default-tls")]
 #[cfg_attr(feature = "http3", ignore = "enabling http3 seems to break this, why?")]
 #[tokio::test]
 async fn test_allowed_methods() {
-    let resp = reqwest::Client::builder()
+    let resp = reqwest_spooftls::Client::builder()
         .https_only(true)
         .build()
         .expect("client builder")
@@ -430,7 +430,7 @@ async fn test_allowed_methods() {
 
     assert!(resp.is_ok());
 
-    let resp = reqwest::Client::builder()
+    let resp = reqwest_spooftls::Client::builder()
         .https_only(true)
         .build()
         .expect("client builder")
@@ -474,7 +474,7 @@ fn update_json_content_type_if_set_manually() {
 #[cfg(all(feature = "__tls", not(feature = "rustls-tls-manual-roots")))]
 #[tokio::test]
 async fn test_tls_info() {
-    let resp = reqwest::Client::builder()
+    let resp = reqwest_spooftls::Client::builder()
         .tls_info(true)
         .build()
         .expect("client builder")
@@ -482,7 +482,7 @@ async fn test_tls_info() {
         .send()
         .await
         .expect("response");
-    let tls_info = resp.extensions().get::<reqwest::tls::TlsInfo>();
+    let tls_info = resp.extensions().get::<reqwest_spooftls::tls::TlsInfo>();
     assert!(tls_info.is_some());
     let tls_info = tls_info.unwrap();
     let peer_certificate = tls_info.peer_certificate();
@@ -490,14 +490,14 @@ async fn test_tls_info() {
     let der = peer_certificate.unwrap();
     assert_eq!(der[0], 0x30); // ASN.1 SEQUENCE
 
-    let resp = reqwest::Client::builder()
+    let resp = reqwest_spooftls::Client::builder()
         .build()
         .expect("client builder")
         .get("https://google.com")
         .send()
         .await
         .expect("response");
-    let tls_info = resp.extensions().get::<reqwest::tls::TlsInfo>();
+    let tls_info = resp.extensions().get::<reqwest_spooftls::tls::TlsInfo>();
     assert!(tls_info.is_none());
 }
 
@@ -508,7 +508,7 @@ async fn test_tls_info() {
 #[cfg(feature = "http2")]
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn highly_concurrent_requests_to_http2_server_with_low_max_concurrent_streams() {
-    let client = reqwest::Client::builder()
+    let client = reqwest_spooftls::Client::builder()
         .http2_prior_knowledge()
         .build()
         .unwrap();
@@ -530,7 +530,7 @@ async fn highly_concurrent_requests_to_http2_server_with_low_max_concurrent_stre
         let url = url.clone();
         async move {
             let res = client.get(&url).send().await.unwrap();
-            assert_eq!(res.status(), reqwest::StatusCode::OK);
+            assert_eq!(res.status(), reqwest_spooftls::StatusCode::OK);
         }
     });
     futures_util::future::join_all(futs).await;
@@ -541,7 +541,7 @@ async fn highly_concurrent_requests_to_http2_server_with_low_max_concurrent_stre
 async fn highly_concurrent_requests_to_slow_http2_server_with_low_max_concurrent_streams() {
     use support::delay_server;
 
-    let client = reqwest::Client::builder()
+    let client = reqwest_spooftls::Client::builder()
         .http2_prior_knowledge()
         .build()
         .unwrap();
@@ -565,7 +565,7 @@ async fn highly_concurrent_requests_to_slow_http2_server_with_low_max_concurrent
         let url = url.clone();
         async move {
             let res = client.get(&url).send().await.unwrap();
-            assert_eq!(res.status(), reqwest::StatusCode::OK);
+            assert_eq!(res.status(), reqwest_spooftls::StatusCode::OK);
         }
     });
     futures_util::future::join_all(futs).await;
@@ -577,7 +577,7 @@ async fn highly_concurrent_requests_to_slow_http2_server_with_low_max_concurrent
 async fn close_connection_after_idle_timeout() {
     let mut server = server::http(move |_| async move { http::Response::default() });
 
-    let client = reqwest::Client::builder()
+    let client = reqwest_spooftls::Client::builder()
         .pool_idle_timeout(std::time::Duration::from_secs(1))
         .build()
         .unwrap();

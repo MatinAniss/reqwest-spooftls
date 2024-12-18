@@ -77,7 +77,7 @@ impl Form {
     /// # Examples
     ///
     /// ```
-    /// let form = reqwest::multipart::Form::new()
+    /// let form = reqwest_spooftls::multipart::Form::new()
     ///     .text("username", "seanmonstar")
     ///     .text("password", "secret");
     /// ```
@@ -97,7 +97,7 @@ impl Form {
     ///
     /// ```no_run
     /// # async fn run() -> std::io::Result<()> {
-    /// let form = reqwest::multipart::Form::new()
+    /// let form = reqwest_spooftls::multipart::Form::new()
     ///     .file("key", "/path/to/file").await?;
     /// # Ok(())
     /// # }

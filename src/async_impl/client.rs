@@ -17,6 +17,7 @@ use hyper_util::client::legacy::connect::HttpConnector;
 #[cfg(feature = "default-tls")]
 use native_tls_crate::TlsConnector;
 use pin_project_lite::pin_project;
+use rustls::client::Fingerprint;
 use std::future::Future;
 use std::pin::Pin;
 use std::task::{Context, Poll};
@@ -173,6 +174,7 @@ struct Config {
     quic_send_window: Option<u64>,
     dns_overrides: HashMap<String, Vec<SocketAddr>>,
     dns_resolver: Option<Arc<dyn Resolve>>,
+    fingerprint: Option<Fingerprint>,
 }
 
 impl Default for ClientBuilder {
@@ -275,6 +277,7 @@ impl ClientBuilder {
                 #[cfg(feature = "http3")]
                 quic_send_window: None,
                 dns_resolver: None,
+                fingerprint: None,
             },
         }
     }
@@ -684,6 +687,11 @@ impl ClientBuilder {
                         )?;
                     }
 
+                    // Use TLS fingerprint if avaiable
+                    if let Some(fingerprint) = config.fingerprint {
+                        tls.with_fingerprint(fingerprint);
+                    }
+
                     Connector::new_rustls_tls(
                         http,
                         tls,
@@ -821,7 +829,7 @@ impl ClientBuilder {
     /// # Example
     ///
     /// ```rust
-    /// # async fn doc() -> Result<(), reqwest::Error> {
+    /// # async fn doc() -> Result<(), reqwest_spooftls::Error> {
     /// // Name your user agent after your app?
     /// static APP_USER_AGENT: &str = concat!(
     ///     env!("CARGO_PKG_NAME"),
@@ -829,7 +837,7 @@ impl ClientBuilder {
     ///     env!("CARGO_PKG_VERSION"),
     /// );
     ///
-    /// let client = reqwest::Client::builder()
+    /// let client = reqwest_spooftls::Client::builder()
     ///     .user_agent(APP_USER_AGENT)
     ///     .build()?;
     /// let res = client.get("https://www.rust-lang.org").send().await?;
@@ -856,8 +864,8 @@ impl ClientBuilder {
     /// # Example
     ///
     /// ```rust
-    /// use reqwest::header;
-    /// # async fn doc() -> Result<(), reqwest::Error> {
+    /// use reqwest_spooftls::header;
+    /// # async fn doc() -> Result<(), reqwest_spooftls::Error> {
     /// let mut headers = header::HeaderMap::new();
     /// headers.insert("X-MY-HEADER", header::HeaderValue::from_static("value"));
     ///
@@ -867,7 +875,7 @@ impl ClientBuilder {
     /// headers.insert(header::AUTHORIZATION, auth_value);
     ///
     /// // get a client builder
-    /// let client = reqwest::Client::builder()
+    /// let client = reqwest_spooftls::Client::builder()
     ///     .default_headers(headers)
     ///     .build()?;
     /// let res = client.get("https://www.rust-lang.org").send().await?;
@@ -1383,7 +1391,7 @@ impl ClientBuilder {
     /// # let _ = rustls::crypto::ring::default_provider().install_default();
     /// use std::net::IpAddr;
     /// let local_addr = IpAddr::from([12, 4, 1, 8]);
-    /// let client = reqwest::Client::builder()
+    /// let client = reqwest_spooftls::Client::builder()
     ///     .local_address(local_addr)
     ///     .build().unwrap();
     /// ```
@@ -1403,7 +1411,7 @@ impl ClientBuilder {
     /// # #[cfg(all(feature = "__rustls", not(feature = "__rustls-ring")))]
     /// # let _ = rustls::crypto::ring::default_provider().install_default();
     /// let interface = "lo";
-    /// let client = reqwest::Client::builder()
+    /// let client = reqwest_spooftls::Client::builder()
     ///     .interface(interface)
     ///     .build().unwrap();
     /// ```
@@ -1952,6 +1960,20 @@ impl ClientBuilder {
     pub fn http3_send_window(mut self, value: u64) -> ClientBuilder {
         self.config.quic_send_window = Some(value);
         self
+    }
+
+    /// Use a specific fingerprint.
+    ///
+    /// This will set the user_agent and TLS fingerprint through spooftls.
+    pub fn use_fingerprint(mut self, fingerprint: Fingerprint) -> ClientBuilder {
+        self.config.fingerprint = Some(fingerprint);
+        self.config.tls = TlsBackend::Rustls;
+
+        match fingerprint {
+            Fingerprint::Chrome131 => {
+                self.user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36")
+            }
+        }
     }
 }
 

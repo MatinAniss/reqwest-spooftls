@@ -7,7 +7,7 @@
 //! # Example
 //!
 //! ```
-//! use reqwest::blocking::multipart;
+//! use reqwest_spooftls::blocking::multipart;
 //!
 //! # fn run() -> Result<(), Box<dyn std::error::Error>> {
 //! let form = multipart::Form::new()
@@ -25,7 +25,7 @@
 //! let form = form.part("biography", bio);
 //!
 //! // And finally, send the form
-//! let client = reqwest::blocking::Client::new();
+//! let client = reqwest_spooftls::blocking::Client::new();
 //! let resp = client
 //!     .post("http://localhost:8080/user")
 //!     .multipart(form)
@@ -84,7 +84,7 @@ impl Form {
     /// # Examples
     ///
     /// ```
-    /// let form = reqwest::blocking::multipart::Form::new()
+    /// let form = reqwest_spooftls::blocking::multipart::Form::new()
     ///     .text("username", "seanmonstar")
     ///     .text("password", "secret");
     /// ```
@@ -104,7 +104,7 @@ impl Form {
     ///
     /// ```no_run
     /// # fn run() -> std::io::Result<()> {
-    /// let form = reqwest::blocking::multipart::Form::new()
+    /// let form = reqwest_spooftls::blocking::multipart::Form::new()
     ///     .file("key", "/path/to/file")?;
     /// # Ok(())
     /// # }
